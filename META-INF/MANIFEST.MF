@@ -6,7 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.wxp.favorites.test.Activator
 Bundle-Vendor: WXP
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.junit;bundle-version="4.13.0",
+ com.wxp.Favorites
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.wxp.favorites.test
 Bundle-ActivationPolicy: lazy
