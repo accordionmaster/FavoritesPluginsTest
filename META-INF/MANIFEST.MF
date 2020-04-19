@@ -8,7 +8,9 @@ Bundle-Vendor: WXP
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.junit;bundle-version="4.13.0",
- com.wxp.Favorites
+ com.wxp.Favorites,
+ org.eclipse.core.expressions;bundle-version="3.6.700",
+ org.eclipse.core.resources;bundle-version="3.13.700"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.wxp.favorites.test
 Bundle-ActivationPolicy: lazy
