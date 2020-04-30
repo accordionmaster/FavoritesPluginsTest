@@ -1,16 +1,37 @@
 package com.wxp.favorites.test;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
+
+import com.wxp.favorites.views.FavoritesView;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-public abstract class AbstractFavoritesTest extends TestCase {
+public class AbstractFavoritesTest {
 
-	public AbstractFavoritesTest(String name) {
-		super(name);
+	private static final String JAVA_PERSPECTIVE_ID = "org.eclipse.jdt.ui.JavaPerspective";
+	private static IWorkbenchPage javaPage = null;
+	
+	public static IWorkbenchPage getJavaPage() throws WorkbenchException {
+		if (javaPage == null) {
+			javaPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.openPage(JAVA_PERSPECTIVE_ID, null);
+		}
+		return javaPage;
 	}
+	
 
 	/**
 	 * Process UI input but do not return for the specified time interval.
@@ -46,49 +67,25 @@ public abstract class AbstractFavoritesTest extends TestCase {
 	 * Wait until all background tasks are complete.
 	 */
 	public void waitForJobs() {
-		while (Platform.getJobManager().currentJob() != null) {
+		while (Job.getJobManager().currentJob() != null) {
 			delay(1000);
 		}
 	}
-
-	/**
-	 * Assert that the two arrays are equal. Throw an AssertionException if they are
-	 * not.
-	 * 
-	 * @param expected first array
-	 * @param actual   second array
-	 */
-	public void assertEquals(Object[] expected, Object[] actual) {
+	
+	protected void assertFavoritesViewContent(FavoritesView favoritesView, Object[] expectedContent, Object[] expectedLabels) {
+		TableViewer viewer = favoritesView.getFavoritesViewer();
 		
-		if (expected == null) {
-			if (actual == null) {
-				return;
-			}else {
-				throw new AssertionFailedError("expected is null, but actual is not");
-			}
-		}else {
-			if (actual == null) {
-				throw new AssertionFailedError("actual is null, but expected is not");
-			}
+		// Assert valid content.
+		IStructuredContentProvider contentProvider = 
+				(IStructuredContentProvider) viewer.getContentProvider();
+		assertArrayEquals(expectedContent, contentProvider.getElements(viewer.getInput()));
+		
+		// Assert valid labels
+		ITableLabelProvider labelProvider = 
+				(ITableLabelProvider) viewer.getLabelProvider();
+		for (int i = 0; i < expectedLabels.length; i++) {
+			assertEquals(expectedLabels[i], labelProvider.getColumnText(expectedContent[i], 1));
 		}
-		
-		assertEquals(
-				"expected.length "
-					+ expected.length
-					+ ", but actual.length " 
-					+ actual.length,
-				expected.length,
-				actual.length);
-		
-		for (int i = 0; i < actual.length; i++)
-			assertEquals(
-					"expected[" + i + 
-					"] is not equal to actual[" + 
-					i + "]", 
-					expected[i], 
-					actual[i]);
-		
-		
-		
 	}
+	
 }

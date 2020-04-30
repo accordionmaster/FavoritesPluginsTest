@@ -1,60 +1,62 @@
 package com.wxp.favorites.test;
 
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
+
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.wxp.favorites.actions.OpenFavoritesViewActionDelegate;
+import com.wxp.favorites.handlers.OpenFavoritesViewHandler;
 import com.wxp.favorites.views.FavoritesView;
 public class OpenFavoritesViewTest extends AbstractFavoritesTest {
 
-	public OpenFavoritesViewTest(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
+
 
 	/**
 	 * Ensure the system state before the test
 	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		
+	@Before
+	public void setUp() throws Exception {
 		// Ensure that hte view is not open.
 		waitForJobs();
-		IWorkbenchPage page = PlatformUI.getWorkbench()
-			.getActiveWorkbenchWindow().getActivePage();
-		IViewPart view = page.findView(FavoritesView.ID);
+		IViewPart view = getJavaPage().findView(FavoritesView.ID);
 		if (view != null) {
-			page.hideView(view);
+			getJavaPage().hideView(view);
 		}
 		
-		// Delay for 3 seconds so that 
-		// the Favorites view can be seen.
 		waitForJobs();
-		delay(3000);
 	}
 	
-	public void testOpenFavoritesView() {
+	@Test
+	public void testOpenFavoritesView() throws WorkbenchException, ExecutionException {
+		
+		// Setup execution context
+		IWorkbenchWindow window = getJavaPage().getWorkbenchWindow();
+		EvaluationContext context = new EvaluationContext(null, window);
+		context.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, window);
+		ExecutionEvent event = new ExecutionEvent(null, Collections.EMPTY_MAP, null, context);
+		
 		// Execute the operation.
-		(new Action("OpenFavoritesViewTest") {
-			public void run() {
-				 IWorkbenchWindowActionDelegate delegate = 
-						 new OpenFavoritesViewActionDelegate();
-				 delegate.init(PlatformUI.getWorkbench()
-						 .getActiveWorkbenchWindow());
-				 delegate.selectionChanged(this, StructuredSelection.EMPTY);
-				 delegate.run(this);
-			};
-		}).run();
+		new OpenFavoritesViewHandler().execute(event);
 		
 		// Test that the operation completed successfully.
 		waitForJobs();
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		assertTrue(page.findView(FavoritesView.ID) != null);
+		IViewPart view = getJavaPage().findView(FavoritesView.ID);
+		assertTrue(view != null);
 	}
 	
 	

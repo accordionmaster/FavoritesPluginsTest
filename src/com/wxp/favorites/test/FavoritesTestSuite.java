@@ -1,21 +1,16 @@
 package com.wxp.favorites.test;
 
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+	FavoritesViewTest.class, OpenFavoritesViewTest.class,
+	AddToFavoritesTest.class
+})
 public class FavoritesTestSuite {
-
-	public static Test suite() {
-		TestSuite suite = 
-				new TestSuite("Favorites test suite");
-		
-		suite.addTest(
-				new TestSuite(FavoritesViewTest.class));
-		
-		suite.addTest(
-				new TestSuite(OpenFavoritesViewTest.class));
-			
-		return suite;
-	}
+	// the class remains completely empty, being used only as a holder for the
+    // above annotations. Thanks goes to
+    // http://radio.javaranch.com/lasse/2006/07/27/1154024535662.html
 }
